@@ -18,7 +18,7 @@ def get_c_flags(**kwargs):
     if is_posix:
         return '-march=x86-64 -mtune=generic -mfpmath=sse -mmmx -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes -mpclmul -mf16c'
     elif is_windows:
-        return '/favor:blend /fp:strict /Qfast_transcendentals /arch:AVX /MP /bigobj'
+        return '/favor:blend /fp:strict /Qfast_transcendentals /arch:AVX /MP /bigobj /EHsc'
     else:
         return ''
 
