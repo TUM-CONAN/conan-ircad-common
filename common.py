@@ -8,12 +8,8 @@ from fnmatch import fnmatch
 
 
 def get_c_flags(**kwargs):
-    if len(kwargs) > 0:
-        is_posix = kwargs.get('is_posix', False)
-        is_windows = kwargs.get('is_windows', False)
-    else:
-        is_posix = tools.os_info.is_posix
-        is_windows = tools.os_info.is_windows
+    is_posix = kwargs.get('is_posix', tools.os_info.is_posix)
+    is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
 
     if is_posix:
         return '-march=x86-64 -mtune=generic -mfpmath=sse -mmmx -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes -mpclmul -mf16c'
@@ -28,12 +24,8 @@ def get_cxx_flags(**kwargs):
 
 
 def get_c_flags_release(**kwargs):
-    if len(kwargs) > 0:
-        is_posix = kwargs.get('is_posix', False)
-        is_windows = kwargs.get('is_windows', False)
-    else:
-        is_posix = tools.os_info.is_posix
-        is_windows = tools.os_info.is_windows
+    is_posix = kwargs.get('is_posix', tools.os_info.is_posix)
+    is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
 
     if is_posix:
         return get_c_flags(**kwargs) + ' -O3 -DNDEBUG'
@@ -48,12 +40,8 @@ def get_cxx_flags_release(**kwargs):
 
 
 def get_c_flags_debug(**kwargs):
-    if len(kwargs) > 0:
-        is_posix = kwargs.get('is_posix', False)
-        is_windows = kwargs.get('is_windows', False)
-    else:
-        is_posix = tools.os_info.is_posix
-        is_windows = tools.os_info.is_windows
+    is_posix = kwargs.get('is_posix', tools.os_info.is_posix)
+    is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
 
     if is_posix:
         return get_c_flags(**kwargs) + ' -Od -g'
@@ -68,12 +56,8 @@ def get_cxx_flags_debug(**kwargs):
 
 
 def get_c_flags_relwithdebinfo(**kwargs):
-    if len(kwargs) > 0:
-        is_posix = kwargs.get('is_posix', False)
-        is_windows = kwargs.get('is_windows', False)
-    else:
-        is_posix = tools.os_info.is_posix
-        is_windows = tools.os_info.is_windows
+    is_posix = kwargs.get('is_posix', tools.os_info.is_posix)
+    is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
 
     if is_posix:
         return get_c_flags_release(**kwargs) + ' -g'
@@ -85,6 +69,23 @@ def get_c_flags_relwithdebinfo(**kwargs):
 
 def get_cxx_flags_relwithdebinfo(**kwargs):
     return get_c_flags_relwithdebinfo(**kwargs)
+
+
+def get_full_c_flags(**kwargs):
+    build_type = kwargs.get('build_type', 'Debug')
+
+    if build_type == 'Debug':
+        return get_c_flags_debug(**kwargs)
+    elif build_type == 'Release':
+        return get_c_flags_release(**kwargs)
+    elif build_type == 'RelWithDebInfo':
+        return get_c_flags_relwithdebinfo(**kwargs)
+    else:
+        return ''
+
+
+def get_full_cxx_flags(**kwargs):
+    return get_full_c_flags(**kwargs)
 
 
 def get_cuda_version():
