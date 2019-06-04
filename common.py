@@ -44,7 +44,7 @@ def get_c_flags_debug(**kwargs):
     is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
 
     if is_posix:
-        return get_c_flags(**kwargs) + ' -Od -g'
+        return get_c_flags(**kwargs) + ' -Og -g'
     elif is_windows:
         return get_c_flags(**kwargs) + ' /Od /Zi /MDd'
     else:
