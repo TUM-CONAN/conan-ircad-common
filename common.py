@@ -27,6 +27,66 @@ def get_cxx_flags(**kwargs):
     return get_c_flags(**kwargs)
 
 
+def get_c_flags_release(**kwargs):
+    if len(kwargs) > 0:
+        is_posix = kwargs.get('is_posix', False)
+        is_windows = kwargs.get('is_windows', False)
+    else:
+        is_posix = tools.os_info.is_posix
+        is_windows = tools.os_info.is_windows
+
+    if is_posix:
+        return get_c_flags(**kwargs) + ' -O3 -DNDEBUG'
+    elif is_windows:
+        return get_c_flags(**kwargs) + ' /O2 /Ob2 /DNDEBUG /MD /GL'
+    else:
+        return ''
+
+
+def get_cxx_flags_release(**kwargs):
+    return get_c_flags_release(**kwargs)
+
+
+def get_c_flags_debug(**kwargs):
+    if len(kwargs) > 0:
+        is_posix = kwargs.get('is_posix', False)
+        is_windows = kwargs.get('is_windows', False)
+    else:
+        is_posix = tools.os_info.is_posix
+        is_windows = tools.os_info.is_windows
+
+    if is_posix:
+        return get_c_flags(**kwargs) + ' -Od -g'
+    elif is_windows:
+        return get_c_flags(**kwargs) + ' /Od /Zi /MDd'
+    else:
+        return ''
+
+
+def get_cxx_flags_debug(**kwargs):
+    return get_c_flags_release(**kwargs)
+
+
+def get_c_flags_relwithdebinfo(**kwargs):
+    if len(kwargs) > 0:
+        is_posix = kwargs.get('is_posix', False)
+        is_windows = kwargs.get('is_windows', False)
+    else:
+        is_posix = tools.os_info.is_posix
+        is_windows = tools.os_info.is_windows
+
+    if is_posix:
+        return get_c_flags_release(**kwargs) + ' -g'
+    elif is_windows:
+        return get_c_flags_release(**kwargs) + ' /Zi'
+    else:
+        return ''
+
+
+def get_cxx_flags_relwithdebinfo(**kwargs):
+    return get_c_flags_relwithdebinfo(**kwargs)
+
+
 def get_cuda_version():
     return ['9.2', '10.0', 'None']
 
@@ -45,6 +105,7 @@ def fix_conan_dependency_path(conanfile, file_path, package_name):
         )
     except:
         conanfile.output.info("Ignoring {0}...".format(package_name))
+
 
 def fix_conan_path(conanfile, root, wildcard):
     for path, subdirs, names in os.walk(root):
