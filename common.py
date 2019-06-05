@@ -12,9 +12,9 @@ def get_c_flags(**kwargs):
     is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
 
     if is_posix:
-        return ' -march=x86-64 -mtune=generic -mfpmath=sse -mmmx -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes -mpclmul -mf16c '
+        return '-march=x86-64 -mtune=generic -mfpmath=sse -mmmx -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes -mpclmul -mf16c'
     elif is_windows:
-        return ' /favor:blend /fp:strict '
+        return '/favor:blend /fp:strict /Qfast_transcendentals /arch:AVX /MP /bigobj /EHsc'
     else:
         return ''
 
