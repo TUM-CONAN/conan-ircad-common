@@ -6,8 +6,10 @@ from conans import ConanFile
 
 class CommonConan(ConanFile):
     name = 'common'
-    version = '1.0.0'
-    license = 'MIT'
+    upstream_version = '1.0.0'
+    package_revision = ''
+    version = "{0}{1}".format(upstream_version, package_revision)
+    
     description = 'Helper functions for conan'
     exports = '*'
     url = 'https://git.ircad.fr/conan/conan-common'
