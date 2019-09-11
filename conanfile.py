@@ -9,7 +9,7 @@ class CommonConan(ConanFile):
     upstream_version = '1.0.1'
     package_revision = ''
     version = "{0}{1}".format(upstream_version, package_revision)
-    
+
     description = 'Helper functions for conan'
     exports = '*'
     url = 'https://git.ircad.fr/conan/conan-common'

@@ -3,7 +3,7 @@
 
 import os
 
-from conans import ConanFile, tools
+from conans import tools
 from fnmatch import fnmatch
 
 
@@ -15,10 +15,12 @@ def get_c_flags(**kwargs):
     if is_posix:
         if is_macos:
             # Our old macos CI is done on a old E5620 Intel(R) Xeon(R) CPU, which doesn't support AVX and f16c
-            # CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AES and PCLMUL instruction set support.
+            # CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2,
+            # POPCNT, AES and PCLMUL instruction set support.
             return '-march=westmere -mtune=intel -mfpmath=sse -arch x86_64 -mmacosx-version-min=10.14'
         else:
-            # CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AES, PCLMUL, FSGSBASE, RDRND and F16C instruction set support.
+            # CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2,
+            # POPCNT, AVX, AES, PCLMUL, FSGSBASE, RDRND and F16C instruction set support.
             return '-march=ivybridge -mtune=generic -mfpmath=sse'
     elif is_windows:
         return '/favor:blend /fp:precise /Qfast_transcendentals /arch:AVX /MP /bigobj /EHsc'
@@ -111,7 +113,7 @@ def fix_conan_dependency_path(conanfile, file_path, package_name):
             "${CONAN_" + package_name.upper() + "_ROOT}",
             strict=False
         )
-    except:
+    except Exception:
         conanfile.output.info("Ignoring {0}...".format(package_name))
 
 
@@ -130,4 +132,3 @@ def fix_conan_path(conanfile, root, wildcard):
 
                 for requirement in conanfile.requires:
                     fix_conan_dependency_path(conanfile, wildcard_file, requirement)
-
