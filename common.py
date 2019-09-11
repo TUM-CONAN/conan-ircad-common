@@ -8,22 +8,16 @@ from fnmatch import fnmatch
 
 
 def get_c_flags(**kwargs):
-    is_posix = kwargs.get('is_posix', tools.os_info.is_posix)
-    is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
-    is_macos = kwargs.get('is_macos', tools.os_info.is_macos)
-
-    if is_posix:
-        if is_macos:
+    if kwargs.get('is_posix', tools.os_info.is_posix):
+        if kwargs.get('is_macos', tools.os_info.is_macos):
             # Our old macos CI is done on a old E5620 Intel(R) Xeon(R) CPU, which doesn't support AVX and f16c
             # CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2,
             # POPCNT, AES and PCLMUL instruction set support.
-            return '-march=westmere -mtune=intel -mfpmath=sse -arch x86_64 -mmacosx-version-min=10.14'
+            return '-march=westmere -mtune=intel -mfpmath=sse -arch x86_64 -mmacosx-version-min=10.14 -DGL_SILENCE_DEPRECATION'
         else:
             # CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2,
             # POPCNT, AVX, AES, PCLMUL, FSGSBASE, RDRND and F16C instruction set support.
-            return '-march=ivybridge -mtune=generic -mfpmath=sse'
-    elif is_windows:
-        return '/favor:blend /fp:precise /Qfast_transcendentals /arch:AVX /MP /bigobj /EHsc'
+        return '/favor:blend /fp:precise /Qfast_transcendentals /arch:AVX /MP /bigobj /EHsc /D_ENABLE_EXTENDED_ALIGNED_STORAGE'
     else:
         return ''
 
@@ -33,13 +27,10 @@ def get_cxx_flags(**kwargs):
 
 
 def get_c_flags_release(**kwargs):
-    is_posix = kwargs.get('is_posix', tools.os_info.is_posix)
-    is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
-
-    if is_posix:
-        return get_c_flags(**kwargs) + ' -O3 -DNDEBUG'
-    elif is_windows:
-        return get_c_flags(**kwargs) + ' /O2 /Ob2 /DNDEBUG /MD /GL'
+    if kwargs.get('is_posix', tools.os_info.is_posix):
+        return get_c_flags(**kwargs) + ' -O3 -fomit-frame-pointer -DNDEBUG'
+    elif kwargs.get('is_windows', tools.os_info.is_windows):
+        return get_c_flags(**kwargs) + ' /O2 /Ob2 /MD /DNDEBUG'
     else:
         return ''
 
@@ -49,13 +40,10 @@ def get_cxx_flags_release(**kwargs):
 
 
 def get_c_flags_debug(**kwargs):
-    is_posix = kwargs.get('is_posix', tools.os_info.is_posix)
-    is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
-
-    if is_posix:
-        return get_c_flags(**kwargs) + ' -Og -g'
-    elif is_windows:
-        return get_c_flags(**kwargs) + ' /Od /Zi /MDd'
+    if kwargs.get('is_posix', tools.os_info.is_posix):
+        return get_c_flags(**kwargs) + ' -Og -g -D_DEBUG'
+    elif kwargs.get('is_windows', tools.os_info.is_windows):
+        return get_c_flags(**kwargs) + ' /Ox /Oy- /Ob1 /Z7 /MDd /D_DEBUG'
     else:
         return ''
 
@@ -65,13 +53,10 @@ def get_cxx_flags_debug(**kwargs):
 
 
 def get_c_flags_relwithdebinfo(**kwargs):
-    is_posix = kwargs.get('is_posix', tools.os_info.is_posix)
-    is_windows = kwargs.get('is_windows', tools.os_info.is_windows)
-
-    if is_posix:
-        return get_c_flags_release(**kwargs) + ' -g'
-    elif is_windows:
-        return get_c_flags_release(**kwargs) + ' /Zi'
+    if kwargs.get('is_posix', tools.os_info.is_posix):
+        return get_c_flags(**kwargs) + ' -O3 -g -DNDEBUG'
+    elif kwargs.get('is_windows', tools.os_info.is_windows):
+        return get_c_flags_release(**kwargs) + ' /Z7'
     else:
         return ''
 
@@ -81,13 +66,13 @@ def get_cxx_flags_relwithdebinfo(**kwargs):
 
 
 def get_full_c_flags(**kwargs):
-    build_type = kwargs.get('build_type', 'Debug')
+    build_type = kwargs.get('build_type', 'debug').lower()
 
-    if build_type == 'Debug':
+    if build_type == 'debug':
         return get_c_flags_debug(**kwargs)
-    elif build_type == 'Release':
+    elif build_type == 'release':
         return get_c_flags_release(**kwargs)
-    elif build_type == 'RelWithDebInfo':
+    elif build_type == 'relwithdebinfo':
         return get_c_flags_relwithdebinfo(**kwargs)
     else:
         return ''
@@ -98,7 +83,7 @@ def get_full_cxx_flags(**kwargs):
 
 
 def get_cuda_version():
-    return ['9.2', '10.0', 'None']
+    return ['9.2', '10.0', '10.1', 'None']
 
 
 def get_cuda_arch():
