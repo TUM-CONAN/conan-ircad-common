@@ -13,11 +13,24 @@ def get_c_flags(**kwargs):
             # Our old macos CI is done on a old E5620 Intel(R) Xeon(R) CPU, which doesn't support AVX and f16c
             # CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2,
             # POPCNT, AES and PCLMUL instruction set support.
-            return '-march=westmere -mtune=intel -mfpmath=sse -arch x86_64 -mmacosx-version-min=10.14 -DGL_SILENCE_DEPRECATION'
+            flags = '-march=westmere'
+            flags += ' -mtune=intel'
+            flags += ' -mfpmath=sse'
+            flags += ' -arch x86_64'
+            flags += ' -mmacosx-version-min=10.14'
+            flags += ' -DGL_SILENCE_DEPRECATION'
+            return flags
         else:
             # CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2,
             # POPCNT, AVX, AES, PCLMUL, FSGSBASE, RDRND and F16C instruction set support.
-        return '/favor:blend /fp:precise /Qfast_transcendentals /arch:AVX /MP /bigobj /EHsc /D_ENABLE_EXTENDED_ALIGNED_STORAGE'
+            flags = '/favor:blend'
+            flags += ' /fp:precise'
+            flags += ' /Qfast_transcendentals'
+            flags += ' /MP'
+            flags += ' /bigobj'
+            flags += ' /EHsc'
+            flags += ' /D_ENABLE_EXTENDED_ALIGNED_STORAGE'
+            return flags
     else:
         return ''
 
