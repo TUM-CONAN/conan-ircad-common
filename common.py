@@ -79,7 +79,7 @@ def get_cxx_flags_relwithdebinfo(**kwargs):
 
 
 def get_full_c_flags(**kwargs):
-    build_type = kwargs.get('build_type', 'debug').lower()
+    build_type = str(kwargs.get('build_type', 'debug')).lower()
 
     if build_type == 'debug':
         return get_c_flags_debug(**kwargs)
