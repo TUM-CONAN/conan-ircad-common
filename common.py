@@ -22,17 +22,21 @@ def get_c_flags(**kwargs):
             return flags
         else:
             # CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2,
-            # POPCNT, AVX, AES, PCLMUL, FSGSBASE, RDRND and F16C instruction set support.
-            flags = '/favor:blend'
-            flags += ' /fp:precise'
-            flags += ' /Qfast_transcendentals'
-            flags += ' /MP'
-            flags += ' /bigobj'
-            flags += ' /EHsc'
-            flags += ' /D_ENABLE_EXTENDED_ALIGNED_STORAGE'
+            # POPCNT, AVX, AES, PCLMUL, FSGSBASE instruction set support.
+            flags = '-march=sandybridge'
+            flags += ' -mtune=generic'
+            flags += ' -mfpmath=sse'
             return flags
     else:
-        return ''
+        # Windows flags..
+        flags = '/favor:blend'
+        flags += ' /fp:precise'
+        flags += ' /Qfast_transcendentals'
+        flags += ' /MP'
+        flags += ' /bigobj'
+        flags += ' /EHsc'
+        flags += ' /D_ENABLE_EXTENDED_ALIGNED_STORAGE'
+        return flags
 
 
 def get_cxx_flags(**kwargs):
