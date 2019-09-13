@@ -45,9 +45,9 @@ def get_cxx_flags(**kwargs):
 
 def get_c_flags_release(**kwargs):
     if kwargs.get('is_posix', tools.os_info.is_posix):
-        return get_c_flags(**kwargs) + ' -O3 -fomit-frame-pointer -DNDEBUG'
+        return '-O3 -fomit-frame-pointer -DNDEBUG'
     elif kwargs.get('is_windows', tools.os_info.is_windows):
-        return get_c_flags(**kwargs) + ' /O2 /Ob2 /MD /DNDEBUG'
+        return '/O2 /Ob2 /MD /DNDEBUG'
     else:
         return ''
 
@@ -58,20 +58,20 @@ def get_cxx_flags_release(**kwargs):
 
 def get_c_flags_debug(**kwargs):
     if kwargs.get('is_posix', tools.os_info.is_posix):
-        return get_c_flags(**kwargs) + ' -Og -g -D_DEBUG'
+        return '-Og -g -D_DEBUG'
     elif kwargs.get('is_windows', tools.os_info.is_windows):
-        return get_c_flags(**kwargs) + ' /Ox /Oy- /Ob1 /Z7 /MDd /D_DEBUG'
+        return '/Ox /Oy- /Ob1 /Z7 /MDd /D_DEBUG'
     else:
         return ''
 
 
 def get_cxx_flags_debug(**kwargs):
-    return get_c_flags_release(**kwargs)
+    return get_c_flags_debug(**kwargs)
 
 
 def get_c_flags_relwithdebinfo(**kwargs):
     if kwargs.get('is_posix', tools.os_info.is_posix):
-        return get_c_flags(**kwargs) + ' -O3 -g -DNDEBUG'
+        return '-O3 -g -DNDEBUG'
     elif kwargs.get('is_windows', tools.os_info.is_windows):
         return get_c_flags_release(**kwargs) + ' /Z7'
     else:
@@ -97,17 +97,7 @@ def get_full_c_flags(**kwargs):
 
 
 def get_full_cxx_flags(**kwargs):
-    cxx_flags = get_cxx_flags(**kwargs)
-    build_type = str(kwargs.get('build_type', 'debug')).lower()
-
-    if build_type == 'debug':
-        cxx_flags += ' ' + get_cxx_flags_debug(**kwargs)
-    elif build_type == 'release':
-        cxx_flags += ' ' + get_cxx_flags_release(**kwargs)
-    elif build_type == 'relwithdebinfo':
-        cxx_flags += ' ' + get_cxx_flags_relwithdebinfo(**kwargs)
-
-    return cxx_flags
+    return get_full_c_flags(**kwargs)
 
 
 def get_cuda_version():
