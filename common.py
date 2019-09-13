@@ -79,20 +79,31 @@ def get_cxx_flags_relwithdebinfo(**kwargs):
 
 
 def get_full_c_flags(**kwargs):
+    c_flags = get_c_flags(**kwargs)
     build_type = str(kwargs.get('build_type', 'debug')).lower()
 
     if build_type == 'debug':
-        return get_c_flags_debug(**kwargs)
+        c_flags += ' ' + get_c_flags_debug(**kwargs)
     elif build_type == 'release':
-        return get_c_flags_release(**kwargs)
+        c_flags += ' ' + get_c_flags_release(**kwargs)
     elif build_type == 'relwithdebinfo':
-        return get_c_flags_relwithdebinfo(**kwargs)
-    else:
-        return ''
+        c_flags += ' ' + get_c_flags_relwithdebinfo(**kwargs)
+
+    return c_flags
 
 
 def get_full_cxx_flags(**kwargs):
-    return get_full_c_flags(**kwargs)
+    cxx_flags = get_cxx_flags(**kwargs)
+    build_type = str(kwargs.get('build_type', 'debug')).lower()
+
+    if build_type == 'debug':
+        cxx_flags += ' ' + get_cxx_flags_debug(**kwargs)
+    elif build_type == 'release':
+        cxx_flags += ' ' + get_cxx_flags_release(**kwargs)
+    elif build_type == 'relwithdebinfo':
+        cxx_flags += ' ' + get_cxx_flags_relwithdebinfo(**kwargs)
+
+    return cxx_flags
 
 
 def get_cuda_version():
@@ -129,4 +140,5 @@ def fix_conan_path(conanfile, root, wildcard):
                 )
 
                 for requirement in conanfile.requires:
-                    fix_conan_dependency_path(conanfile, wildcard_file, requirement)
+                    fix_conan_dependency_path(
+                        conanfile, wildcard_file, requirement)
