@@ -34,6 +34,7 @@ def get_c_flags(**kwargs):
         flags = '/favor:blend'
         flags += ' /fp:precise'
         flags += ' /Qfast_transcendentals'
+        flags += ' /arch:AVX'
         flags += ' /MP'
         flags += ' /bigobj'
         flags += ' /EHsc'
