@@ -100,67 +100,6 @@ def get_full_cxx_flags(**kwargs):
     return get_full_c_flags(**kwargs)
 
 
-def add_compile_options(**kwargs):
-    # Get the cmake file to patch
-    cmakelists_path = kwargs.get('cmakelists_path', None)
-
-    # Read original cmake file
-    with open(cmakelists_path, 'r') as original:
-        data = original.read()
-
-    # Prepend the modification
-    with open(cmakelists_path, 'w') as modified:
-        # Add common flags
-        modified.write(
-            'add_compile_options(' + get_cxx_flags() + ')\n'
-        )
-
-        # Get build type, defaulting to debug
-        build_type = str(kwargs.get('build_type', 'debug')).lower()
-
-        if build_type == 'release':
-            # Add release flags
-            modified.write(
-                'add_compile_options(' + get_cxx_flags_release() + ')\n'
-            )
-        elif build_type == 'debug':
-            # Add debug flags
-            debug_flags = get_cxx_flags_debug()
-            modified.write(
-                'add_compile_options(' + debug_flags + ')\n'
-            )
-
-            # Special case on windows, which doesn't support mixing /Ox with /RTC1
-            if tools.os_info.is_windows and (
-                '/O1' in debug_flags or '/O2' in debug_flags or '/Ox' in debug_flags
-            ):
-                modified.write(
-                    'set(CMAKE_C_FLAGS_DEBUG_INIT ' + debug_flags + ')\n'
-                )
-                modified.write(
-                    'set(CMAKE_CXX_FLAGS_DEBUG_INIT ' + debug_flags + ')\n'
-                )
-                modified.write(
-                    'string(REGEX REPLACE "/RTC[1csu]+" "" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")\n'
-                )
-                modified.write(
-                    'string(REGEX REPLACE "/RTC[1csu]+" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")\n'
-                )
-        elif build_type == 'relwithdebinfo':
-            # Add relwithdebinfo flags
-            modified.write(
-                'add_compile_options(' + get_cxx_flags_relwithdebinfo() + ')\n'
-            )
-
-        # Write additional options
-        additional_options = kwargs.get('additional_options', None)
-        if additional_options:
-            modified.write(additional_options + '\n')
-
-        # Finally, write the original data
-        modified.write(data)
-
-
 def generate_cmake_wrapper(**kwargs):
     # Get the cmake wrapper path
     cmakelists_path = kwargs.get('cmakelists_path', None)
@@ -171,6 +110,48 @@ def generate_cmake_wrapper(**kwargs):
         cmake_wrapper.write('project(cmake_wrapper)\n')
         cmake_wrapper.write('include(conanbuildinfo.cmake)\n')
         cmake_wrapper.write('conan_basic_setup()\n')
+
+        # Add common flags
+        cmake_wrapper.write(
+            'add_compile_options(' + get_cxx_flags() + ')\n'
+        )
+
+        # Get build type, defaulting to debug
+        build_type = str(kwargs.get('build_type', 'debug')).lower()
+
+        if build_type == 'release':
+            # Add release flags
+            cmake_wrapper.write(
+                'add_compile_options(' + get_cxx_flags_release() + ')\n'
+            )
+        elif build_type == 'debug':
+            # Add debug flags
+            debug_flags = get_cxx_flags_debug()
+            cmake_wrapper.write(
+                'add_compile_options(' + debug_flags + ')\n'
+            )
+
+            # Special case on windows, which doesn't support mixing /Ox with /RTC1
+            if tools.os_info.is_windows and (
+                '/O1' in debug_flags or '/O2' in debug_flags or '/Ox' in debug_flags
+            ):
+                cmake_wrapper.write(
+                    'set(CMAKE_C_FLAGS_DEBUG_INIT ' + debug_flags + ')\n'
+                )
+                cmake_wrapper.write(
+                    'set(CMAKE_CXX_FLAGS_DEBUG_INIT ' + debug_flags + ')\n'
+                )
+                cmake_wrapper.write(
+                    'string(REGEX REPLACE "/RTC[1csu]+" "" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")\n'
+                )
+                cmake_wrapper.write(
+                    'string(REGEX REPLACE "/RTC[1csu]+" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")\n'
+                )
+        elif build_type == 'relwithdebinfo':
+            # Add relwithdebinfo flags
+            cmake_wrapper.write(
+                'add_compile_options(' + get_cxx_flags_relwithdebinfo() + ')\n'
+            )
 
         # Write additional options
         additional_options = kwargs.get('additional_options', None)
