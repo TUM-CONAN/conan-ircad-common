@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shutil
 
 from conans import tools
 from fnmatch import fnmatch
@@ -101,6 +102,11 @@ def get_full_cxx_flags(**kwargs):
 
 
 def generate_cmake_wrapper(**kwargs):
+    # If we don't have a source subfolder, we must rename the original CMakeLists.txt
+    source_subfolder = kwargs.get('source_subfolder', None)
+    if not source_subfolder:
+        shutil.move('CMakeLists.txt', 'CMakeLists.txt.upstream')
+
     # Get the cmake wrapper path
     cmakelists_path = kwargs.get('cmakelists_path', None)
 
@@ -158,10 +164,11 @@ def generate_cmake_wrapper(**kwargs):
         if additional_options:
             cmake_wrapper.write(additional_options + '\n')
 
-        # Write the original subdirectory
-        source_subfolder = kwargs.get('source_subfolder', 'source_subfolder')
-        cmake_wrapper.write('add_subdirectory("' + source_subfolder + '")\n')
-        cmake_wrapper.write('\n')
+        # Write the original subdirectory / include
+        if source_subfolder:
+            cmake_wrapper.write('add_subdirectory("' + source_subfolder + '")\n')
+        else:
+            cmake_wrapper.write('include("CMakeLists.txt.upstream")\n')
 
 
 def get_cuda_version():
