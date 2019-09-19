@@ -6,6 +6,7 @@ import shutil
 
 from conans import tools
 from fnmatch import fnmatch
+from pathlib import Path
 
 
 def get_c_flags(**kwargs):
@@ -102,13 +103,13 @@ def get_full_cxx_flags(**kwargs):
 
 
 def generate_cmake_wrapper(**kwargs):
-    # If we don't have a source subfolder, we must rename the original CMakeLists.txt
-    source_subfolder = kwargs.get('source_subfolder', None)
-    if not source_subfolder:
-        shutil.move('CMakeLists.txt', 'CMakeLists.txt.upstream')
-
     # Get the cmake wrapper path
-    cmakelists_path = kwargs.get('cmakelists_path', None)
+    cmakelists_path = kwargs.get('cmakelists_path', 'CMakeLists.txt')
+    cmakelists_exists = Path(cmakelists_path).is_file()
+
+    # If there is an existing CMakeLists.txt, we must rename it
+    if cmakelists_exists:
+        shutil.move(cmakelists_path, cmakelists_path + '.upstream')
 
     # Write the file content
     with open(cmakelists_path, 'w') as cmake_wrapper:
@@ -165,10 +166,11 @@ def generate_cmake_wrapper(**kwargs):
             cmake_wrapper.write(additional_options + '\n')
 
         # Write the original subdirectory / include
-        if source_subfolder:
-            cmake_wrapper.write('add_subdirectory("' + source_subfolder + '")\n')
-        else:
+        if cmakelists_exists:
             cmake_wrapper.write('include("CMakeLists.txt.upstream")\n')
+        else:
+            source_subfolder = kwargs.get('source_subfolder', 'source_subfolder')
+            cmake_wrapper.write('add_subdirectory("' + source_subfolder + '")\n')
 
 
 def get_cuda_version():
