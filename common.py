@@ -130,6 +130,15 @@ def generate_cmake_wrapper(**kwargs):
             'add_compile_options(' + get_cxx_flags() + ')\n'
         )
 
+        # Disable warnings and error because of warnings
+        cmake_wrapper.write(
+            'add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/W0;/WX->")\n'
+        )
+
+        cmake_wrapper.write(
+            'add_compile_options("$<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-w;-Wno-error>")\n'
+        )
+
         # Get build type, defaulting to debug
         build_type = str(kwargs.get('build_type', 'debug')).lower()
 
