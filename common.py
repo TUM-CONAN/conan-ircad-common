@@ -112,7 +112,7 @@ def add_compile_options(**kwargs):
     with open(cmake_file_path, 'w') as modified:
         # Add common flags
         modified.write(
-            'add_compile_options(' + common.get_cxx_flags() + ')\n'
+            'add_compile_options(' + get_cxx_flags() + ')\n'
         )
 
         # Get build type, defaulting to debug
@@ -121,11 +121,11 @@ def add_compile_options(**kwargs):
         if build_type == 'release':
             # Add release flags
             modified.write(
-                'add_compile_options(' + common.get_cxx_flags_release() + ')\n'
+                'add_compile_options(' + get_cxx_flags_release() + ')\n'
             )
         elif build_type == 'debug':
             # Add debug flags
-            debug_flags = common.get_cxx_flags_debug()
+            debug_flags = get_cxx_flags_debug()
             modified.write(
                 'add_compile_options(' + debug_flags + ')\n'
             )
@@ -149,7 +149,7 @@ def add_compile_options(**kwargs):
         elif build_type == 'relwithdebinfo':
             # Add relwithdebinfo flags
             modified.write(
-                'add_compile_options(' + common.get_cxx_flags_relwithdebinfo() + ')\n'
+                'add_compile_options(' + get_cxx_flags_relwithdebinfo() + ')\n'
             )
 
         # Write additional options
@@ -157,7 +157,7 @@ def add_compile_options(**kwargs):
         if additional_options:
             modified.write(additional_options + '\n')
 
-        # Finally, write the original data        
+        # Finally, write the original data
         modified.write(data)
 
 
@@ -171,7 +171,7 @@ def generate_cmake_wrapper(**kwargs):
         cmake_wrapper.write('project(cmake_wrapper)\n')
         cmake_wrapper.write('include(conanbuildinfo.cmake)\n')
         cmake_wrapper.write('conan_basic_setup()\n')
-        
+
         # Write additional options
         additional_options = kwargs.get('additional_options', None)
         if additional_options:
