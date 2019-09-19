@@ -149,12 +149,6 @@ def generate_cmake_wrapper(**kwargs):
                 '/O1' in debug_flags or '/O2' in debug_flags or '/Ox' in debug_flags
             ):
                 cmake_wrapper.write(
-                    'set(CMAKE_C_FLAGS_DEBUG_INIT ' + debug_flags + ')\n'
-                )
-                cmake_wrapper.write(
-                    'set(CMAKE_CXX_FLAGS_DEBUG_INIT ' + debug_flags + ')\n'
-                )
-                cmake_wrapper.write(
                     'string(REGEX REPLACE "/RTC[1csu]+" "" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")\n'
                 )
                 cmake_wrapper.write(
