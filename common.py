@@ -102,14 +102,14 @@ def get_full_cxx_flags(**kwargs):
 
 def add_compile_options(**kwargs):
     # Get the cmake file to patch
-    cmake_file_path = kwargs.get('cmake_file_path', None)
+    cmakelists_path = kwargs.get('cmakelists_path', None)
 
     # Read original cmake file
-    with open(cmake_file_path, 'r') as original:
+    with open(cmakelists_path, 'r') as original:
         data = original.read()
 
     # Prepend the modification
-    with open(cmake_file_path, 'w') as modified:
+    with open(cmakelists_path, 'w') as modified:
         # Add common flags
         modified.write(
             'add_compile_options(' + get_cxx_flags() + ')\n'
@@ -163,10 +163,10 @@ def add_compile_options(**kwargs):
 
 def generate_cmake_wrapper(**kwargs):
     # Get the cmake wrapper path
-    cmake_wrapper_path = kwargs.get('cmake_wrapper_path', None)
+    cmakelists_path = kwargs.get('cmakelists_path', None)
 
     # Write the file content
-    with open(cmake_wrapper_path, 'w') as cmake_wrapper:
+    with open(cmakelists_path, 'w') as cmake_wrapper:
         cmake_wrapper.write('cmake_minimum_required(VERSION 3.0)\n')
         cmake_wrapper.write('project(cmake_wrapper)\n')
         cmake_wrapper.write('include(conanbuildinfo.cmake)\n')
