@@ -126,8 +126,6 @@ def generate_cmake_wrapper(**kwargs):
         cmake_wrapper.write('elseif(EXISTS "${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake")\n')
         cmake_wrapper.write('   include(${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake)\n')
         cmake_wrapper.write('endif()\n')
-        cmake_wrapper.write('include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n')
-        cmake_wrapper.write('include(${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake)\n')
         cmake_wrapper.write('conan_basic_setup()\n')
 
         # Add common flags
