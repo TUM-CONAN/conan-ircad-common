@@ -3,6 +3,7 @@
 
 import os
 import shutil
+import re
 
 from conans import tools
 from fnmatch import fnmatch
@@ -191,7 +192,7 @@ def get_cuda_arch():
     return ['3.0', '3.5', '5.0', '5.2', '6.1']
 
 
-def fix_conan_dependency_path(conanfile, file_path, package_name):
+def __fix_conan_dependency_path(conanfile, file_path, package_name):
     try:
         tools.replace_in_file(
             file_path,
@@ -203,19 +204,70 @@ def fix_conan_dependency_path(conanfile, file_path, package_name):
         conanfile.output.info("Ignoring {0}...".format(package_name))
 
 
-def fix_conan_path(conanfile, root, wildcard):
+def __cmake_fix_macos_sdk_path(conanfile, file_path):
+    try:
+        # Read in the file
+        with open(file_path, 'r') as file:
+            file_data = file.read()
+
+        if file_data:
+            # Replace the target string
+            pattern = (r';/Applications/Xcode\.app/Contents/Developer'
+                       r'/Platforms/MacOSX\.platform/Developer/SDKs/MacOSX\d\d\.\d\d\.sdk/usr/include')
+
+            # Match sdk path
+            file_data = re.sub(pattern, '', file_data, re.M)
+
+            # Write the file out again
+            with open(file_path, 'w') as file:
+                file.write(file_data)
+
+    except Exception:
+        conanfile.output.info("Skipping macOS SDK fix on {0}...".format(file_path))
+
+
+def fix_conan_path(
+    conanfile,
+    root,
+    wildcard,
+    build_folder=None
+):
+    # Normalization
+    package_folder = conanfile.package_folder.replace('\\', '/')
+
+    if build_folder:
+        build_folder = build_folder.replace('\\', '/')
+
+    conan_root = '${CONAN_' + conanfile.name.upper() + '_ROOT}'
+
+    # Recursive walk
     for path, subdirs, names in os.walk(root):
         for name in names:
             if fnmatch(name, wildcard):
                 wildcard_file = os.path.join(path, name)
 
+                # Fix package_folder paths
                 tools.replace_in_file(
                     wildcard_file,
-                    conanfile.package_folder.replace('\\', '/'),
-                    '${CONAN_' + conanfile.name.upper() + '_ROOT}',
+                    package_folder,
+                    conan_root,
                     strict=False
                 )
 
+                # Fix build folder paths
+                if build_folder:
+                    tools.replace_in_file(
+                        wildcard_file,
+                        build_folder,
+                        conan_root,
+                        strict=False
+                    )
+
+                # Fix specific macOS SDK paths
+                if tools.os_info.is_macos:
+                    __cmake_fix_macos_sdk_path(wildcard_file)
+
+                # Fix dependencies paths
                 for requirement in conanfile.requires:
-                    fix_conan_dependency_path(
+                    __fix_conan_dependency_path(
                         conanfile, wildcard_file, requirement)
