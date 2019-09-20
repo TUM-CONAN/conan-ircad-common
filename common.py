@@ -117,13 +117,7 @@ def generate_cmake_wrapper(**kwargs):
     with open(cmakelists_path, 'w') as cmake_wrapper:
         cmake_wrapper.write('cmake_minimum_required(VERSION 3.0)\n')
         cmake_wrapper.write('project(cmake_wrapper)\n')
-
-        # If there is an existing CMakeLists.txt, we build from the source subfolder
-        if cmakelists_exists:
-            cmake_wrapper.write('include(../conanbuildinfo.cmake)\n')
-        else:
-            cmake_wrapper.write('include(conanbuildinfo.cmake)\n')
-
+        cmake_wrapper.write('include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n')
         cmake_wrapper.write('conan_basic_setup()\n')
 
         # Add common flags
