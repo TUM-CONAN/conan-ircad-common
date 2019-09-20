@@ -248,26 +248,23 @@ def fix_conan_path(
 
                 # Fix package_folder paths
                 tools.replace_in_file(
-                    wildcard_file,
-                    package_folder,
-                    conan_root,
-                    strict=False
+                    wildcard_file, package_folder, conan_root, strict=False
                 )
 
                 # Fix build folder paths
                 if build_folder:
                     tools.replace_in_file(
-                        wildcard_file,
-                        build_folder,
-                        conan_root,
-                        strict=False
+                        wildcard_file, build_folder, conan_root, strict=False
                     )
 
                 # Fix specific macOS SDK paths
                 if tools.os_info.is_macos:
-                    __cmake_fix_macos_sdk_path(wildcard_file)
+                    __cmake_fix_macos_sdk_path(
+                        conanfile, wildcard_file
+                    )
 
                 # Fix dependencies paths
                 for requirement in conanfile.requires:
                     __fix_conan_dependency_path(
-                        conanfile, wildcard_file, requirement)
+                        conanfile, wildcard_file, requirement
+                    )
