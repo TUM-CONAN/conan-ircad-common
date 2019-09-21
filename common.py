@@ -47,7 +47,7 @@ def get_cxx_flags(**kwargs):
     return get_c_flags(**kwargs)
 
 
-def get_c_flags_release(**kwargs):
+def get_release_c_flags(**kwargs):
     if kwargs.get('is_posix', tools.os_info.is_posix):
         return '-O3 -fomit-frame-pointer -DNDEBUG'
     elif kwargs.get('is_windows', tools.os_info.is_windows):
@@ -56,11 +56,11 @@ def get_c_flags_release(**kwargs):
         return ''
 
 
-def get_cxx_flags_release(**kwargs):
-    return get_c_flags_release(**kwargs)
+def get_release_cxx_flags(**kwargs):
+    return get_release_c_flags(**kwargs)
 
 
-def get_c_flags_debug(**kwargs):
+def get_debug_c_flags(**kwargs):
     if kwargs.get('is_posix', tools.os_info.is_posix):
         return '-Og -g -D_DEBUG'
     elif kwargs.get('is_windows', tools.os_info.is_windows):
@@ -69,33 +69,46 @@ def get_c_flags_debug(**kwargs):
         return ''
 
 
-def get_cxx_flags_debug(**kwargs):
-    return get_c_flags_debug(**kwargs)
+def get_debug_cxx_flags(**kwargs):
+    return get_debug_c_flags(**kwargs)
 
 
-def get_c_flags_relwithdebinfo(**kwargs):
+def get_relwithdebinfo_c_flags(**kwargs):
     if kwargs.get('is_posix', tools.os_info.is_posix):
         return '-O3 -g -DNDEBUG'
     elif kwargs.get('is_windows', tools.os_info.is_windows):
-        return get_c_flags_release(**kwargs) + ' /Z7'
+        return get_release_c_flags(**kwargs) + ' /Z7'
     else:
         return ''
 
 
-def get_cxx_flags_relwithdebinfo(**kwargs):
-    return get_c_flags_relwithdebinfo(**kwargs)
+def get_relwithdebinfo_cxx_flags(**kwargs):
+    return get_relwithdebinfo_c_flags(**kwargs)
 
 
+def get_thorough_debug_c_flags(**kwargs):
+    if kwargs.get('is_posix', tools.os_info.is_posix):
+        return '-O0 -g3 -D_DEBUG'
+    elif kwargs.get('is_windows', tools.os_info.is_windows):
+        return '/Og /Ob0 /RTC1 /sdl /Zi /MDd /D_DEBUG'
+    else:
+        return ''
+
+
+def get_thorough_debug_cxx_flags(**kwargs):
+    return get_thorough_debug_c_flags(**kwargs)
+    
+    
 def get_full_c_flags(**kwargs):
     c_flags = get_c_flags(**kwargs)
     build_type = str(kwargs.get('build_type', 'debug')).lower()
 
     if build_type == 'debug':
-        c_flags += ' ' + get_c_flags_debug(**kwargs)
+        c_flags += ' ' + get_debug_c_flags(**kwargs)
     elif build_type == 'release':
-        c_flags += ' ' + get_c_flags_release(**kwargs)
+        c_flags += ' ' + get_release_c_flags(**kwargs)
     elif build_type == 'relwithdebinfo':
-        c_flags += ' ' + get_c_flags_relwithdebinfo(**kwargs)
+        c_flags += ' ' + get_relwithdebinfo_c_flags(**kwargs)
 
     return c_flags
 
@@ -148,11 +161,11 @@ def generate_cmake_wrapper(**kwargs):
         if build_type == 'release':
             # Add release flags
             cmake_wrapper.write(
-                'add_compile_options(' + get_cxx_flags_release() + ')\n'
+                'add_compile_options(' + get_release_cxx_flags() + ')\n'
             )
         elif build_type == 'debug':
             # Add debug flags
-            debug_flags = get_cxx_flags_debug()
+            debug_flags = get_debug_cxx_flags()
             cmake_wrapper.write(
                 'add_compile_options(' + debug_flags + ')\n'
             )
@@ -170,7 +183,7 @@ def generate_cmake_wrapper(**kwargs):
         elif build_type == 'relwithdebinfo':
             # Add relwithdebinfo flags
             cmake_wrapper.write(
-                'add_compile_options(' + get_cxx_flags_relwithdebinfo() + ')\n'
+                'add_compile_options(' + get_relwithdebinfo_cxx_flags() + ')\n'
             )
 
         # Write additional options
