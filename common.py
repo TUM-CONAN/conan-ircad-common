@@ -97,8 +97,8 @@ def get_thorough_debug_c_flags(**kwargs):
 
 def get_thorough_debug_cxx_flags(**kwargs):
     return get_thorough_debug_c_flags(**kwargs)
-    
-    
+
+
 def get_full_c_flags(**kwargs):
     c_flags = get_c_flags(**kwargs)
     build_type = str(kwargs.get('build_type', 'debug')).lower()
