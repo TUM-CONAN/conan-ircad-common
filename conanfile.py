@@ -11,6 +11,10 @@ class CommonConan(ConanFile):
     package_revision = ''
     version = "{0}{1}".format(upstream_version, package_revision)
 
+    exports = [
+        'common.py'
+    ]
+
     description = 'Helper functions for conan'
     url = 'https://git.ircad.fr/conan/conan-common'
     build_policy = 'missing'
