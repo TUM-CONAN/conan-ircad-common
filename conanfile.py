@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 
 from conans import ConanFile
 
@@ -22,6 +23,8 @@ class CommonConan(ConanFile):
         del self.settings.compiler.cppstd
         del self.settings.compiler.libcxx
         del self.settings.compiler.version
+        del self.settings.os
+        del self.settings.os_build
 
         if 'CI' not in os.environ:
             os.environ["CONAN_SYSREQUIRES_MODE"] = "verify"
