@@ -16,15 +16,6 @@ class CommonConan(ConanFile):
     build_policy = 'missing'
 
     def configure(self):
-        del self.settings.arch_build
-        del self.settings.build_type
-        del self.settings.compiler
-        del self.settings.compiler.cppstd
-        del self.settings.compiler.libcxx
-        del self.settings.compiler.version
-        del self.settings.os
-        del self.settings.os_build
-
         if 'CI' not in os.environ:
             os.environ["CONAN_SYSREQUIRES_MODE"] = "verify"
 
