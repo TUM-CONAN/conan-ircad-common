@@ -16,7 +16,6 @@ class CommonConan(ConanFile):
     build_policy = 'missing'
 
     def configure(self):
-        del self.settings.arch
         del self.settings.arch_build
         del self.settings.build_type
         del self.settings.compiler
