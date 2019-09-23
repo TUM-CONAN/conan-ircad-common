@@ -11,9 +11,22 @@ class CommonConan(ConanFile):
     version = "{0}{1}".format(upstream_version, package_revision)
 
     description = 'Helper functions for conan'
-    exports = '*'
     url = 'https://git.ircad.fr/conan/conan-common'
     build_policy = 'missing'
+
+    def configure(self):
+        del self.settings.arch
+        del self.settings.arch_build
+        del self.settings.build_type
+        del self.settings.compiler
+        del self.settings.compiler.cppstd
+        del self.settings.compiler.libcxx
+        del self.settings.compiler.version
+        del self.settings.os
+        del self.settings.os_build
+
+        if 'CI' not in os.environ:
+            os.environ["CONAN_SYSREQUIRES_MODE"] = "verify"
 
     def package(self):
         self.copy('common.py')
