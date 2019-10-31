@@ -90,7 +90,7 @@ def get_thorough_debug_c_flags(**kwargs):
     if kwargs.get('is_posix', tools.os_info.is_posix):
         return '-O0 -g3 -D_DEBUG'
     elif kwargs.get('is_windows', tools.os_info.is_windows):
-        return '/Og /Ob0 /RTC1 /sdl /Zi /MDd /D_DEBUG'
+        return '/Od /Ob0 /RTC1 /sdl /Z7 /MDd /D_DEBUG'
     else:
         return ''
 
@@ -128,16 +128,32 @@ def generate_cmake_wrapper(**kwargs):
 
     # Write the file content
     with open(cmakelists_path, 'w') as cmake_wrapper:
-        cmake_wrapper.write('cmake_minimum_required(VERSION 3.0)\n')
+        cmake_wrapper.write('cmake_minimum_required(VERSION 3.15)\n')
         cmake_wrapper.write('project(cmake_wrapper)\n')
-        cmake_wrapper.write('if(EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")\n')
-        cmake_wrapper.write('   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n')
-        cmake_wrapper.write('elseif(EXISTS "${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake")\n')
-        cmake_wrapper.write('   include(${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake)\n')
-        cmake_wrapper.write('elseif(EXISTS "${CMAKE_BINARY_DIR}/../../conanbuildinfo.cmake")\n')
-        cmake_wrapper.write('   include(${CMAKE_BINARY_DIR}/../../conanbuildinfo.cmake)\n')
-        cmake_wrapper.write('elseif(EXISTS "${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake")\n')
-        cmake_wrapper.write('   include(${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake)\n')
+        cmake_wrapper.write(
+            'if(EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")\n'
+        )
+        cmake_wrapper.write(
+            '   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n'
+        )
+        cmake_wrapper.write(
+            'elseif(EXISTS "${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake")\n'
+        )
+        cmake_wrapper.write(
+            '   include(${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake)\n'
+        )
+        cmake_wrapper.write(
+            'elseif(EXISTS "${CMAKE_BINARY_DIR}/../../conanbuildinfo.cmake")\n'
+        )
+        cmake_wrapper.write(
+            '   include(${CMAKE_BINARY_DIR}/../../conanbuildinfo.cmake)\n'
+        )
+        cmake_wrapper.write(
+            'elseif(EXISTS "${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake")\n'
+        )
+        cmake_wrapper.write(
+            '   include(${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake)\n'
+        )
         cmake_wrapper.write('endif()\n')
         cmake_wrapper.write('conan_basic_setup()\n')
 
@@ -195,8 +211,12 @@ def generate_cmake_wrapper(**kwargs):
         if cmakelists_exists:
             cmake_wrapper.write('include("CMakeLists.txt.upstream")\n')
         else:
-            source_subfolder = kwargs.get('source_subfolder', 'source_subfolder')
-            cmake_wrapper.write('add_subdirectory("' + source_subfolder + '")\n')
+            source_subfolder = kwargs.get(
+                'source_subfolder', 'source_subfolder'
+            )
+            cmake_wrapper.write(
+                'add_subdirectory("' + source_subfolder + '")\n'
+            )
 
 
 def get_cuda_version():
@@ -204,7 +224,7 @@ def get_cuda_version():
 
 
 def get_cuda_arch():
-    return ['3.0', '3.5', '5.0', '5.2', '6.1']
+    return ['3.0', '3.5', '3.7', '5.0', '5.2', '6.0', '6.1', '7.0', '7.5']
 
 
 def __fix_conan_dependency_path(conanfile, file_path, package_name):
@@ -238,7 +258,9 @@ def __cmake_fix_macos_sdk_path(conanfile, file_path):
                 file.write(file_data)
 
     except Exception:
-        conanfile.output.info("Skipping macOS SDK fix on {0}...".format(file_path))
+        conanfile.output.info(
+            "Skipping macOS SDK fix on {0}...".format(file_path)
+        )
 
 
 def fix_conan_path(
