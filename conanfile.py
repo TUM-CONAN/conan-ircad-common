@@ -7,7 +7,7 @@ from conans import ConanFile
 
 class CommonConan(ConanFile):
     name = 'common'
-    upstream_version = '1.0.1'
+    upstream_version = '1.0.2'
     package_revision = ''
     version = "{0}{1}".format(upstream_version, package_revision)
 
