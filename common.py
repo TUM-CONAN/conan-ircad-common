@@ -220,7 +220,7 @@ def generate_cmake_wrapper(**kwargs):
 
             # Propagate host CXX flags
             host_cxx_flags = ",\\\""
-            host_cxx_flags += get_full_cxx_flags(build_type=build_type).replace( ' ', "\\\",\\\"" )
+            host_cxx_flags += get_full_cxx_flags(build_type=build_type).replace(' ', "\\\",\\\"")
             host_cxx_flags += "\\\""
 
             cmake_wrapper.write(
