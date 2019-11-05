@@ -202,6 +202,31 @@ def generate_cmake_wrapper(**kwargs):
                 'add_compile_options(' + get_relwithdebinfo_cxx_flags() + ')\n'
             )
 
+        # Write CUDA specific code
+        setup_cuda = kwargs.get('setup_cuda', False)
+
+        if setup_cuda:
+            cmake_wrapper.write(
+                'find_package(CUDA)\n'
+            )
+
+            cmake_wrapper.write(
+                'CUDA_SELECT_NVCC_ARCH_FLAGS(ARCH_FLAGS ' + ' '.join(get_cuda_arch()) + ')\n'
+            )
+
+            cmake_wrapper.write(
+                'LIST(APPEND CUDA_NVCC_FLAGS ${ARCH_FLAGS})\n'
+            )
+
+            # Propagate host CXX flags
+            host_cxx_flags = ",\\\""
+            host_cxx_flags += get_full_cxx_flags(build_type=build_type).replace( ' ', "\\\",\\\"" )
+            host_cxx_flags += "\\\""
+
+            cmake_wrapper.write(
+                'LIST(APPEND CUDA_NVCC_FLAGS -Xcompiler ' + host_cxx_flags + ')\n'
+            )
+
         # Write additional options
         additional_options = kwargs.get('additional_options', None)
         if additional_options:
