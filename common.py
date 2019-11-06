@@ -129,6 +129,19 @@ def generate_cmake_wrapper(**kwargs):
     # Write the file content
     with open(cmakelists_path, 'w') as cmake_wrapper:
         cmake_wrapper.write('cmake_minimum_required(VERSION 3.15)\n')
+
+        # New policies management. It must be done before 'project(cmake_wrapper)'
+        new_policies = kwargs.get('new_policies', None)
+        if new_policies:
+            for new_policy in new_policies:
+                cmake_wrapper.write("cmake_policy(SET {0} NEW)\n".format(new_policy))
+
+        # Old policies management. It must be done before 'project(cmake_wrapper)'
+        old_policies = kwargs.get('old_policies', None)
+        if old_policies:
+            for old_policy in old_policies:
+                cmake_wrapper.write("cmake_policy(SET {0} OLD)\n".format(old_policy))
+
         cmake_wrapper.write('project(cmake_wrapper)\n')
         cmake_wrapper.write(
             'if(EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")\n'
