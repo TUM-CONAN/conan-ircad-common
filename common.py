@@ -90,7 +90,7 @@ def get_thorough_debug_c_flags(**kwargs):
     if kwargs.get('is_posix', tools.os_info.is_posix):
         return '-O0 -g3 -D_DEBUG'
     elif kwargs.get('is_windows', tools.os_info.is_windows):
-        return '/Og /Ob0 /RTC1 /sdl /Zi /MDd /D_DEBUG'
+        return '/Od /Ob0 /RTC1 /sdl /Z7 /MDd /D_DEBUG'
     else:
         return ''
 
@@ -128,16 +128,45 @@ def generate_cmake_wrapper(**kwargs):
 
     # Write the file content
     with open(cmakelists_path, 'w') as cmake_wrapper:
-        cmake_wrapper.write('cmake_minimum_required(VERSION 3.0)\n')
+        cmake_wrapper.write('cmake_minimum_required(VERSION 3.15)\n')
+
+        # New policies management. It must be done before 'project(cmake_wrapper)'
+        new_policies = kwargs.get('new_policies', None)
+        if new_policies:
+            for new_policy in new_policies:
+                cmake_wrapper.write("cmake_policy(SET {0} NEW)\n".format(new_policy))
+
+        # Old policies management. It must be done before 'project(cmake_wrapper)'
+        old_policies = kwargs.get('old_policies', None)
+        if old_policies:
+            for old_policy in old_policies:
+                cmake_wrapper.write("cmake_policy(SET {0} OLD)\n".format(old_policy))
+
         cmake_wrapper.write('project(cmake_wrapper)\n')
-        cmake_wrapper.write('if(EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")\n')
-        cmake_wrapper.write('   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n')
-        cmake_wrapper.write('elseif(EXISTS "${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake")\n')
-        cmake_wrapper.write('   include(${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake)\n')
-        cmake_wrapper.write('elseif(EXISTS "${CMAKE_BINARY_DIR}/../../conanbuildinfo.cmake")\n')
-        cmake_wrapper.write('   include(${CMAKE_BINARY_DIR}/../../conanbuildinfo.cmake)\n')
-        cmake_wrapper.write('elseif(EXISTS "${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake")\n')
-        cmake_wrapper.write('   include(${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake)\n')
+        cmake_wrapper.write(
+            'if(EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")\n'
+        )
+        cmake_wrapper.write(
+            '   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)\n'
+        )
+        cmake_wrapper.write(
+            'elseif(EXISTS "${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake")\n'
+        )
+        cmake_wrapper.write(
+            '   include(${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake)\n'
+        )
+        cmake_wrapper.write(
+            'elseif(EXISTS "${CMAKE_BINARY_DIR}/../../conanbuildinfo.cmake")\n'
+        )
+        cmake_wrapper.write(
+            '   include(${CMAKE_BINARY_DIR}/../../conanbuildinfo.cmake)\n'
+        )
+        cmake_wrapper.write(
+            'elseif(EXISTS "${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake")\n'
+        )
+        cmake_wrapper.write(
+            '   include(${CMAKE_BINARY_DIR}/../../../conanbuildinfo.cmake)\n'
+        )
         cmake_wrapper.write('endif()\n')
         cmake_wrapper.write('conan_basic_setup()\n')
 
@@ -186,6 +215,31 @@ def generate_cmake_wrapper(**kwargs):
                 'add_compile_options(' + get_relwithdebinfo_cxx_flags() + ')\n'
             )
 
+        # Write CUDA specific code
+        setup_cuda = kwargs.get('setup_cuda', False)
+
+        if setup_cuda:
+            cmake_wrapper.write(
+                'find_package(CUDA)\n'
+            )
+
+            cmake_wrapper.write(
+                'CUDA_SELECT_NVCC_ARCH_FLAGS(ARCH_FLAGS ' + ' '.join(get_cuda_arch()) + ')\n'
+            )
+
+            cmake_wrapper.write(
+                'LIST(APPEND CUDA_NVCC_FLAGS ${ARCH_FLAGS})\n'
+            )
+
+            # Propagate host CXX flags
+            host_cxx_flags = ",\\\""
+            host_cxx_flags += get_full_cxx_flags(build_type=build_type).replace(' ', "\\\",\\\"")
+            host_cxx_flags += "\\\""
+
+            cmake_wrapper.write(
+                'LIST(APPEND CUDA_NVCC_FLAGS -Xcompiler ' + host_cxx_flags + ')\n'
+            )
+
         # Write additional options
         additional_options = kwargs.get('additional_options', None)
         if additional_options:
@@ -195,8 +249,12 @@ def generate_cmake_wrapper(**kwargs):
         if cmakelists_exists:
             cmake_wrapper.write('include("CMakeLists.txt.upstream")\n')
         else:
-            source_subfolder = kwargs.get('source_subfolder', 'source_subfolder')
-            cmake_wrapper.write('add_subdirectory("' + source_subfolder + '")\n')
+            source_subfolder = kwargs.get(
+                'source_subfolder', 'source_subfolder'
+            )
+            cmake_wrapper.write(
+                'add_subdirectory("' + source_subfolder + '")\n'
+            )
 
 
 def get_cuda_version():
@@ -204,7 +262,7 @@ def get_cuda_version():
 
 
 def get_cuda_arch():
-    return ['3.0', '3.5', '5.0', '5.2', '6.1']
+    return ['3.0', '3.5', '3.7', '5.0', '5.2', '6.0', '6.1', '7.0', '7.5']
 
 
 def __fix_conan_dependency_path(conanfile, file_path, package_name):
@@ -238,7 +296,9 @@ def __cmake_fix_macos_sdk_path(conanfile, file_path):
                 file.write(file_data)
 
     except Exception:
-        conanfile.output.info("Skipping macOS SDK fix on {0}...".format(file_path))
+        conanfile.output.info(
+            "Skipping macOS SDK fix on {0}...".format(file_path)
+        )
 
 
 def fix_conan_path(
