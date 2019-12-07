@@ -258,7 +258,7 @@ def generate_cmake_wrapper(**kwargs):
 
 
 def get_cuda_version():
-    return ['9.2', '10.0', '10.1', 'None']
+    return ['9.2', '10.0', '10.1', '10.2', 'None']
 
 
 def get_cuda_arch():
