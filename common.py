@@ -258,11 +258,11 @@ def generate_cmake_wrapper(**kwargs):
 
 
 def get_cuda_version():
-    return ['9.2', '10.0', '10.1', '10.2', 'None']
+    return ['9.2', '10.0', '10.1', '10.2', '11.0', '11.1', '11.2', 'None']
 
 
 def get_cuda_arch():
-    return ['3.0', '3.5', '3.7', '5.0', '5.2', '6.0', '6.1', '7.0', '7.5']
+    return ['5.0', '5.2', '6.0', '6.1', '7.0', '7.5', '8.0', '8.6', '9.0', '10.0', '11.0', '12.0']
 
 
 def __fix_conan_dependency_path(conanfile, file_path, package_name):
