@@ -262,7 +262,7 @@ def get_cuda_version():
 
 
 def get_cuda_arch():
-    return ['5.0', '5.2', '6.0', '6.1', '7.0', '7.5', '8.0', '8.6', '9.0', '10.0', '11.0', '12.0']
+    return ['5.0', '5.2', '6.0', '6.1', '7.0', '7.2', '7.5', '8.0', '8.6']
 
 
 def __fix_conan_dependency_path(conanfile, file_path, package_name):
